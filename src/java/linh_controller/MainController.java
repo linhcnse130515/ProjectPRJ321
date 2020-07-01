@@ -20,6 +20,17 @@ public class MainController extends HttpServlet {
     private static final String LOGIN = "LoginController";
     private static final String LOGOUT = "LogoutController";
     private static final String REGISNA = "RegisNameController";
+    private static final String ADMIN = "AdminController";
+    private static final String DELBOOK = "DeleteBookController";
+    private static final String UPDBOOK = "UpdateBookController";
+    private static final String NEWBOOK = "NewBookController";
+    private static final String GETALL = "GetAllBooksController";
+    private static final String ADDCART = "AddCartController";
+    private static final String REMOVE = "RemoveCartController";
+    private static final String SAVE = "SaveCartController";
+    private static final String ORDER = "OrderController";
+    private static final String DELCART = "DeleteCartController";
+    private static final String REGISTER = "RegisterController";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -37,11 +48,32 @@ public class MainController extends HttpServlet {
             String btn = request.getParameter("btnAction");
             if (btn.equals("Login")){
                 success = LOGIN;
-            }
-            else if (btn.equals("Logout")){
+            }else if (btn.equals("Logout")){
                 success = LOGOUT;
             }else if (btn.equals("RegisName")){
                 success = REGISNA;
+            }else if (btn.equals("Admin")){
+                success = ADMIN;
+            }else if (btn.equals("Delete Book")){
+                success = DELBOOK;
+            }else if (btn.equals("Update Book")){
+                success = UPDBOOK;
+            }else if (btn.equals("New Book")){
+                success = NEWBOOK;
+            }else if (btn.equals("GetAll")){
+                success = GETALL;
+            }else if (btn.equals("AddCart")){
+                success = ADDCART;
+            }else if (btn.equals("Remove Book")){
+                success = REMOVE;
+            }else if (btn.equals("Save")){
+                success = SAVE;
+            }else if (btn.equals("Order")){
+                success = ORDER;
+            }else if (btn.equals("DeleteCart")){
+                success = DELCART;
+            }else if (btn.equals("Register")){
+                success = REGISTER;
             }
         } catch (Exception e) {
         }finally{

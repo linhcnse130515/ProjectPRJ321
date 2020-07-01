@@ -1,0 +1,5 @@
+DB:
+	-User(Manager,Staff):id,pass,name,role,status
+	-Student:MSSV,name,specialize,status
+	-Books:code,name,author,status,borrower
+	-Cart:borrowDay,payDay

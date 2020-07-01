@@ -6,24 +6,21 @@
 package linh_controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import linh_dao.UserDAO;
-import linh_dto.UserDTO;
+import linh_dto.CartDTO;
 
 /**
  *
  * @author nguye
  */
-@WebServlet(name = "LoginController", urlPatterns = {"/LoginController"})
-public class LoginController extends HttpServlet {
-    private static final String SUCCESS = "index.jsp";
-    private static final String FAIL = "login.jsp";
+@WebServlet(name = "RemoveCartController", urlPatterns = {"/RemoveCartController"})
+public class RemoveCartController extends HttpServlet {
+    private final String SUCCESS = "cart.jsp";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -36,29 +33,18 @@ public class LoginController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String url = FAIL;
+        String url = SUCCESS;
         try {
-            String userID = request.getParameter("txtUserID");
-            String password = request.getParameter("txtPassword");
-            UserDAO dao = new UserDAO();
-            UserDTO dto = dao.checkLogin(userID, password);
-            if (dto != null){
-                url = SUCCESS;
-                HttpSession session = request.getSession();
-                session.setAttribute("USER", dto);
-                String role;
-                if (dto.getRole().trim().equals("Admin")){
-                    role = "Admin";                    
-                }else{
-                    role = "User";
-                }        
-                session.setAttribute("ROLE", role);
-            }else{
-                request.setAttribute("MESSAGE", "User ID or Password is wrong!");
-            }
+            String id = request.getParameter("id");
+            HttpSession session = request.getSession();
+            CartDTO cart = (CartDTO)session.getAttribute("CART");
+            cart.delete(id);
+            session.setAttribute("CART", cart);
         } catch (Exception e) {
+            log("Exception at DeleteCartController: " + e.toString() );
         }finally{
-            request.getRequestDispatcher(url).forward(request, response);
+            //request.getRequestDispatcher(url).forward(request, response);
+            response.sendRedirect(SUCCESS);
         }
     }
 

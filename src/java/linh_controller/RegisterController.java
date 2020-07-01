@@ -15,15 +15,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import linh_dao.UserDAO;
 import linh_dto.UserDTO;
+import linh_dto.UserErr;
 
 /**
  *
  * @author nguye
  */
-@WebServlet(name = "LoginController", urlPatterns = {"/LoginController"})
-public class LoginController extends HttpServlet {
-    private static final String SUCCESS = "index.jsp";
-    private static final String FAIL = "login.jsp";
+@WebServlet(name = "RegisterController", urlPatterns = {"/RegisterController"})
+public class RegisterController extends HttpServlet {
+
+    private final String SUCCESS = "index.jsp";
+    private final String ERR = "register.jsp";
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -36,29 +39,63 @@ public class LoginController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String url = FAIL;
+        PrintWriter out = response.getWriter();
+        String url = ERR;
+        UserErr errors = new UserErr();
         try {
             String userID = request.getParameter("txtUserID");
-            String password = request.getParameter("txtPassword");
-            UserDAO dao = new UserDAO();
-            UserDTO dto = dao.checkLogin(userID, password);
-            if (dto != null){
-                url = SUCCESS;
-                HttpSession session = request.getSession();
-                session.setAttribute("USER", dto);
-                String role;
-                if (dto.getRole().trim().equals("Admin")){
-                    role = "Admin";                    
-                }else{
-                    role = "User";
-                }        
-                session.setAttribute("ROLE", role);
-            }else{
-                request.setAttribute("MESSAGE", "User ID or Password is wrong!");
+            String userName = request.getParameter("txtUserName");
+            String password = request.getParameter("txtPassWord");
+            String rePassWord = request.getParameter("txtConfirm");
+            boolean valid = true;
+            if (userID.length() < 3 || userID.length() > 10) {
+                errors.setUserIDErr("ID has to from 3 to 10 char!");
+                valid = false;
             }
-        } catch (Exception e) {
-        }finally{
+            if (userID.isEmpty()) {
+                errors.setUserIDErr("ID can't be blank!");
+                valid = false;
+            }
+            if (userName.isEmpty()) {
+                errors.setUserNameErr("UserName can't be blank!");
+                valid = false;
+            }
+            if (password.length() < 1 || password.length() > 15) {
+                errors.setPassWordErr("Password has to from 1 to 15 char!");
+                valid = false;
+            }
+            if (password.isEmpty()) {
+                errors.setPassWordErr("Password can't be blank!");
+                valid = false;
+            }
+            if (!rePassWord.equals(password)) {
+                errors.setPassWordErr("Password is not match!");
+                valid = false;
+            }
+            if (valid) {
+                UserDAO dao = new UserDAO();
+                UserDTO dto = new UserDTO(userID, password , "User",  userName);
+                if (dao.insert(dto)) {
+                    url = SUCCESS;
+                    HttpSession session = request.getSession();
+                    session.setAttribute("ERRORS", null);
+                }
+            } else {
+                HttpSession session = request.getSession();
+                session.setAttribute("ERRORS", errors);
+            }
+
+        } catch (Exception ex) {
+            log("Exception at RegisterController  " + ex.getMessage());
+            if (ex.getMessage().contains("duplicate")) {
+                errors.setUserIDErr("UserID is existed!");
+                HttpSession session = request.getSession();
+                session.setAttribute("ERRORS", errors);
+            }
+
+        } finally {
             request.getRequestDispatcher(url).forward(request, response);
+            //response.sendRedirect(url);
         }
     }
 

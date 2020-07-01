@@ -13,17 +13,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import linh_dao.UserDAO;
-import linh_dto.UserDTO;
+import linh_dao.BookDAO;
+import linh_dto.BookDTO;
+import linh_dto.CartDTO;
 
 /**
  *
  * @author nguye
  */
-@WebServlet(name = "LoginController", urlPatterns = {"/LoginController"})
-public class LoginController extends HttpServlet {
-    private static final String SUCCESS = "index.jsp";
-    private static final String FAIL = "login.jsp";
+@WebServlet(name = "SaveCartController", urlPatterns = {"/SaveCartController"})
+public class SaveCartController extends HttpServlet {
+
+    private final String SUCCESS = "cart.jsp";
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -36,29 +38,29 @@ public class LoginController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String url = FAIL;
         try {
-            String userID = request.getParameter("txtUserID");
-            String password = request.getParameter("txtPassword");
-            UserDAO dao = new UserDAO();
-            UserDTO dto = dao.checkLogin(userID, password);
-            if (dto != null){
-                url = SUCCESS;
+            String code = request.getParameter("id");
+            String name = request.getParameter("name");
+            String author = request.getParameter("author");
+            int quantity = Integer.parseInt(request.getParameter("quantity"));
+            if (quantity > 0) {
+                BookDTO dto = new BookDTO(code, name, author, quantity);
                 HttpSession session = request.getSession();
-                session.setAttribute("USER", dto);
-                String role;
-                if (dto.getRole().trim().equals("Admin")){
-                    role = "Admin";                    
+                CartDTO cart = (CartDTO) session.getAttribute("CART");
+                BookDAO dao = new BookDAO();
+                if(dao.getQuantity(code, cart.getBorDay(), cart.getPayDay()) >= quantity){
+                    cart.update(dto);
                 }else{
-                    role = "User";
-                }        
-                session.setAttribute("ROLE", role);
-            }else{
-                request.setAttribute("MESSAGE", "User ID or Password is wrong!");
+                    request.setAttribute("MESSAGEORDER", "You have selected the number of book that exceeds the remaining quantity");
+                }
+            } else {
+                request.setAttribute("MESSAGEORDER", "Quantity must be greater than 0!");
             }
         } catch (Exception e) {
-        }finally{
-            request.getRequestDispatcher(url).forward(request, response);
+            log("Exception at BookController: " + e.toString());
+        } finally {
+            request.getRequestDispatcher(SUCCESS).forward(request, response);
+            //response.sendRedirect(SUCCESS);
         }
     }
 

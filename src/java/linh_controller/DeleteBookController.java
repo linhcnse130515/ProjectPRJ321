@@ -12,18 +12,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import linh_dao.UserDAO;
-import linh_dto.UserDTO;
+import linh_dao.BookDAO;
 
 /**
  *
  * @author nguye
  */
-@WebServlet(name = "LoginController", urlPatterns = {"/LoginController"})
-public class LoginController extends HttpServlet {
-    private static final String SUCCESS = "index.jsp";
-    private static final String FAIL = "login.jsp";
+@WebServlet(name = "DeleteBookController", urlPatterns = {"/DeleteBookController"})
+public class DeleteBookController extends HttpServlet {
+    private final String SUCCESS="AdminController";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -36,28 +33,15 @@ public class LoginController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String url = FAIL;
+        String url = SUCCESS;
         try {
-            String userID = request.getParameter("txtUserID");
-            String password = request.getParameter("txtPassword");
-            UserDAO dao = new UserDAO();
-            UserDTO dto = dao.checkLogin(userID, password);
-            if (dto != null){
-                url = SUCCESS;
-                HttpSession session = request.getSession();
-                session.setAttribute("USER", dto);
-                String role;
-                if (dto.getRole().trim().equals("Admin")){
-                    role = "Admin";                    
-                }else{
-                    role = "User";
-                }        
-                session.setAttribute("ROLE", role);
-            }else{
-                request.setAttribute("MESSAGE", "User ID or Password is wrong!");
-            }
-        } catch (Exception e) {
-        }finally{
+            String proID = request.getParameter("txtBookID");
+            BookDAO dao = new BookDAO();
+            dao.delete(proID);
+        }catch(Exception e){
+            log("Exception at DeleteProController: " + e.toString());
+        } 
+        finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
     }

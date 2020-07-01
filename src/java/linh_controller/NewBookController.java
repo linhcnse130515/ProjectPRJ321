@@ -13,17 +13,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import linh_dao.UserDAO;
-import linh_dto.UserDTO;
+import linh_dao.BookDAO;
+import linh_dto.BookDTO;
+import linh_dto.BookErr;
 
 /**
  *
  * @author nguye
  */
-@WebServlet(name = "LoginController", urlPatterns = {"/LoginController"})
-public class LoginController extends HttpServlet {
-    private static final String SUCCESS = "index.jsp";
-    private static final String FAIL = "login.jsp";
+@WebServlet(name = "NewBookController", urlPatterns = {"/NewBookController"})
+public class NewBookController extends HttpServlet {
+    private static String SUCCESS = "AdminController";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -35,29 +35,53 @@ public class LoginController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        String url = FAIL;
+        response.setContentType("text/html;charset=UTF-8");request.setCharacterEncoding("utf-8");
+        String url = SUCCESS;
+        BookErr errors = new BookErr();
+        String code = request.getParameter("txtCode");
+        String name = request.getParameter("txtName");
+        String author = request.getParameter("txtAuthor");
+        int quantity = Integer.parseInt(request.getParameter("txtQuantity"));
+        String image = request.getParameter("txtImage");
         try {
-            String userID = request.getParameter("txtUserID");
-            String password = request.getParameter("txtPassword");
-            UserDAO dao = new UserDAO();
-            UserDTO dto = dao.checkLogin(userID, password);
-            if (dto != null){
-                url = SUCCESS;
-                HttpSession session = request.getSession();
-                session.setAttribute("USER", dto);
-                String role;
-                if (dto.getRole().trim().equals("Admin")){
-                    role = "Admin";                    
-                }else{
-                    role = "User";
-                }        
-                session.setAttribute("ROLE", role);
-            }else{
-                request.setAttribute("MESSAGE", "User ID or Password is wrong!");
+            boolean valid = true;
+            if (code.length() < 3){
+                errors.setBookIDErr("ID has to from 3 char!");
+                valid = false;
             }
-        } catch (Exception e) {
-        }finally{
+            if (code.isEmpty()) {
+                errors.setBookIDErr("ID can't be blank!");
+                valid = false;
+            }           
+            if (name.isEmpty()) {
+                errors.setBookNameErr("Name can't be blank!");
+                valid = false;
+            }
+            
+            if (author.isEmpty()) {
+                errors.setStatusErr("Status can't be blank!");
+                valid = false;
+            }
+            if (quantity < 0){
+                errors.setBookQuanErr("Quantity must be greater than 0!");
+                valid = false;
+            }
+            if (valid) {
+                BookDAO dao = new BookDAO();
+                BookDTO dto = new BookDTO(code, name, author, quantity, true, image);               
+                dao.insert(dto);
+            } else {
+                request.setAttribute("ERRORSBOOK", errors);
+            }
+
+        } catch (Exception ex) {
+            log("Exception at AddProController  " + ex.getMessage());
+            if (ex.getMessage().contains("duplicate")) {
+                errors.setBookIDErr("Book ID is existed!");
+                request.setAttribute("ERRORSBOOK", errors);
+            }
+
+        } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
     }

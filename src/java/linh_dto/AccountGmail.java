@@ -10,24 +10,24 @@ package linh_dto;
  * @author nguye
  */
 public class AccountGmail {
-    private String code;
+    private String userID;
     private String gmail;
     private String fullName;
     private String role;
 
-    public AccountGmail(String code, String gmail, String fullName, String role) {
-        this.code = code;
+    public AccountGmail(String userID, String gmail, String fullName, String role) {
+        this.userID = userID;
         this.gmail = gmail;
         this.fullName = fullName;
         this.role = role;
     }
 
-    public String getCode() {
-        return code;
+    public String getUserID() {
+        return userID;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 
     public String getGmail() {

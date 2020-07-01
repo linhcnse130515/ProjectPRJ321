@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import linh_dao.UserDAO;
 import linh_dto.AccountGmail;
 import linh_dto.GooglePojo;
@@ -43,6 +44,15 @@ public class RegisNameController extends HttpServlet {
             UserDAO dao = new UserDAO();
             AccountGmail acc = new AccountGmail(code, gmail, fullName, "User");
             dao.InsertAccMail(acc);
+            HttpSession session = request.getSession();
+            session.setAttribute("USER", acc);
+            String role;
+                if (acc.getRole().trim().equals("Admin")){
+                    role = "Admin";                    
+                }else{
+                    role = "User";
+                }        
+                session.setAttribute("ROLE", role);
         } catch (Exception e) {
         } finally {
             request.getRequestDispatcher("index.jsp").forward(request, response);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/Project">
-    <Resource auth="Container" driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver" name="DBCon" password="123" username="sa" type="javax.sql.DataSource" url="jdbc:sqlserver://localhost:1433;databaseName=ProjectPRJ321" >
+    <Resource auth="Container" driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver" name="DBCon" password="123" username="sa" type="javax.sql.DataSource" url="jdbc:sqlserver://localhost:1433;databaseName=ProjectWeb" >
     </Resource>
 </Context>

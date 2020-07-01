@@ -1,6 +1,6 @@
 <%-- 
-    Document   : login
-    Created on : May 25, 2020, 3:38:24 PM
+    Document   : register
+    Created on : Mar 10, 2020, 1:34:04 PM
     Author     : nguye
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -9,7 +9,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Login Page</title>
+        <title>Register Page</title>
     </head>
     <link rel="stylesheet" href="CSS/Header.css" />
     <link rel="stylesheet" href="CSS/Footer.css" />
@@ -45,18 +45,16 @@
                 </c:if> 
             </div>    
         </nav>
-        <div class="login"> 
+        <div class="login">       
             <form action="MainController" method="POST">
-                User ID :<input type="text" name="txtUserID"></br>
-                Password :<input type="password" name="txtPassword"></br>
-                <input type="submit" name="btnAction" value="Login">
-                <input type="reset" name="reset">
+                User ID*: <input type="text" name="txtUserID" value="" >${sessionScope.ERRORS.getUserIDErr()}<br>
+                PassWord*: <input type="password" name="txtPassWord" value="" >${sessionScope.ERRORS.getPassWordErr()}<br>
+                Confirm* : <input type="password" name="txtConfirm" value="" >${sessionScope.ERRORS.getPassWordErr()}<br>
+                Full name*: <input type="text" name="txtUserName" value="" >${sessionScope.ERRORS.getUserNameErr()}<br>
+                <input type="submit" name="btnAction" value="Register" >
+                <input type="reset" value="Reset" ><br>
             </form>
-            <a href="register.jsp">Register</a>
-            <a href="https://accounts.google.com/o/oauth2/auth?scope=email&redirect_uri=http://localhost:8084/Project/LoginGmailController&response_type=code
-               &client_id=976519729204-b8sdfs891eeu4c18beajv7912qffd99p.apps.googleusercontent.com&approval_prompt=force">Login With Google</a></br>
-            ${requestScope.MESSAGE}
-        </div>  
+        </div>     
         <footer>
             <div class="footerLeft">
                 <ul>
@@ -75,6 +73,6 @@
                 </ul>
             </div>
 
-        </footer>
+        </footer>    
     </body>
 </html>

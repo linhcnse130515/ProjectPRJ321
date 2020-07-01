@@ -1,0 +1,144 @@
+<%-- 
+    Document   : admin
+    Created on : Jun 15, 2020, 2:30:10 PM
+    Author     : nguye
+--%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Admin Page</title>
+    </head>
+    <link rel="stylesheet" href="CSS/Header.css" />
+    <link rel="stylesheet" href="CSS/Article.css" />
+    <link rel="stylesheet" href="CSS/Footer.css" />
+    <body>
+        <header>
+            <img src="https://300b5338.vws.vegacdn.vn/image/img.news/0/0/0/275.jpg?v=1&w=628&h=365&nocache=1" />
+        </header>
+        <nav>
+            <div class="navi">
+                <a href="index.jsp" a>HOME</a>
+                <a href="books.jsp">BOOKS</a>
+                <a href="contact.jsp" a>CONTACT US</a>
+                <c:if test="${empty sessionScope.USER}">
+                    <a href="login.jsp" a>LOGIN</a>
+                </c:if>
+                <c:if test="${not empty sessionScope.USER}">
+                    <c:url var="user" value="MainController">
+                        <c:if test="${sessionScope.ROLE == 'Admin'}">
+                            <c:param name="btnAction" value="Admin"></c:param>
+                        </c:if>
+                        <c:if test="${sessionScope.ROLE == 'User'}">
+                            <c:param name="btnAction" value="User"></c:param>
+                        </c:if>
+                    </c:url>
+                    <a href="${user}">${sessionScope.USER.fullName}</a>  
+                    <c:if test="${sessionScope.ROLE == 'User'}">
+                        <a href="cart.jsp">Cart</a>
+                    </c:if>
+                    <c:url var="logout" value="MainController">
+                        <c:param name="btnAction" value="Logout"></c:param>
+                    </c:url>
+                    <a href="${logout}">Logout</a>
+                </c:if> 
+            </div>    
+        </nav>
+        <div class="cart">
+            <h1>
+                Welcome: ${sessionScope.USER.fullName}
+            </h1>
+            <form action="MainController">
+                Book ID*: <input type="text" name="txtCode" value="" >${requestScope.ERRORSBOOK.getBookIDErr()}<br>
+                Book name*: <input type="text" name="txtName" value="" >${requestScope.ERRORSBOOK.getBookNameErr()}<br>
+                Author : <input type="text" name="txtAuthor" value="" ><br>
+                Quantity : <input type="number" name="txtQuantity" value="0" >${requestScope.ERRORSBOOK.getBookQuanErr()}<br>
+                Image : <input type="text" name="txtImage" value=""><br>
+                Status*: <input type="text" name="txtStatus" value="" >${requestScope.ERRORSBOOK.getStatusErr()}<br>
+                <input type="submit" name="btnAction" value="New Book" >
+                <input type="reset" value="Reset" ><br>
+            </form>
+            <center>
+                ${requestScope.MESSAGE}
+                <c:if test="${requestScope.BOOKLIST != null}">
+                    <table border="1">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Book ID</th>
+                                <th>Book Name</th>
+                                <th>Author</th>
+                                <th>Quantity</th>
+                                <th>Image</th>
+                                <th>Status</th>
+                                <th>Delete</th>
+                                <th>Update</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="list" varStatus="counter" items="${requestScope.BOOKLIST}">
+                            <form action="MainController">  
+                                <tr>
+                                    <td>
+                                        ${counter.count}
+                                    </td>
+                                    <td>
+                                        ${list.code}
+                                        <input type="hidden" name="txtCode" value="${list.code}" />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="txtName" value="${list.name}" />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="txtAuthor" value="${list.author}" />
+                                    </td>
+                                    <td>
+                                        <input type="number" name="txtQuantity" value="${list.quantity}" />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="txtImage" value="${list.image}" />
+                                    </td>
+                                    <td>
+                                        <input type="text" name="txtStatus" value="${list.status}" />
+                                    </td>
+                                    <td>
+                                        <c:url var="deleteLink" value="MainController">
+                                            <c:param name="txtBookID" value="${list.code}"></c:param>
+                                            <c:param name="btnAction" value="Delete Book"></c:param>
+                                        </c:url>
+                                        <a href="${deleteLink}">Delete</a>
+                                    </td>
+                                    <td>
+                                        <input type="submit" name="btnAction" value="Update Book"/>
+                                    </td>
+                                </tr>
+                            </form>    
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                </c:if>
+            </center>        
+        </div>
+        <footer>
+            <div class="footerLeft">
+                <ul>
+                    <li> Address 1: 183 B 3/2 Street,11 Ward,10 District,HCM City </li>
+                    <li> Phone :0908.882.588 </li>
+                    <li> Guide to buy online </li>
+                    <li> Guide to buy installment </li>
+                </ul>
+            </div>
+            <div class="footerRight">
+                <ul>
+                    <li> Address 2: 300 Quang Trung ward,Go Vap District,HCM City </li>
+                    <li> Phone :028665.004.500</li>
+                    <li> Warranty Policy </li>
+                    <li> Setup software for free </li>
+                </ul>
+            </div>
+
+        </footer>
+    </body>
+</html>

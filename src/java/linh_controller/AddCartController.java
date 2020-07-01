@@ -6,24 +6,24 @@
 package linh_controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import linh_dao.UserDAO;
-import linh_dto.UserDTO;
+import linh_dto.BookDTO;
+import linh_dto.CartDTO;
 
 /**
  *
  * @author nguye
  */
-@WebServlet(name = "LoginController", urlPatterns = {"/LoginController"})
-public class LoginController extends HttpServlet {
-    private static final String SUCCESS = "index.jsp";
-    private static final String FAIL = "login.jsp";
+@WebServlet(name = "AddCartController", urlPatterns = {"/AddCartController"})
+public class AddCartController extends HttpServlet {
+
+    private final String SUCCESS = "GetAllBooksController";
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -36,29 +36,36 @@ public class LoginController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String url = FAIL;
+        request.setCharacterEncoding("utf-8");
         try {
-            String userID = request.getParameter("txtUserID");
-            String password = request.getParameter("txtPassword");
-            UserDAO dao = new UserDAO();
-            UserDTO dto = dao.checkLogin(userID, password);
-            if (dto != null){
-                url = SUCCESS;
-                HttpSession session = request.getSession();
-                session.setAttribute("USER", dto);
-                String role;
-                if (dto.getRole().trim().equals("Admin")){
-                    role = "Admin";                    
-                }else{
-                    role = "User";
-                }        
-                session.setAttribute("ROLE", role);
-            }else{
-                request.setAttribute("MESSAGE", "User ID or Password is wrong!");
+            HttpSession session = request.getSession();
+            String borDay = request.getParameter("BORDAY");
+            String payDay = request.getParameter("PAYDAY");
+            String bookString = request.getParameter("BookString");
+            int amount = Integer.parseInt(request.getParameter("txtAmount"));
+            String tmp[] = bookString.split("-");
+            BookDTO dto = new BookDTO(tmp[0], tmp[1], tmp[2], 0);
+            CartDTO cart = (CartDTO) session.getAttribute("CART");
+            if (cart == null) {
+                cart = new CartDTO(borDay, payDay);
             }
+            cart.add(dto, 0);
+            if(amount < 1){
+                request.setAttribute("MESSAGEBOOK", "You have selected the number of book greater than 0");
+            }else
+            if (cart.getQuantity(dto) + amount > Integer.parseInt(tmp[3])) {
+                request.setAttribute("MESSAGEBOOK", "You have selected the number of book that exceeds the remaining quantity");
+            } else {
+                cart.add(dto, amount);
+                session.setAttribute("CART", cart);
+                request.setAttribute("MESSAGEBOOK", "You add " + tmp[1] + " to card successful!");
+            }
+            request.setAttribute("BORDAY", borDay);
+            request.setAttribute("PAYDAY", payDay);
         } catch (Exception e) {
-        }finally{
-            request.getRequestDispatcher(url).forward(request, response);
+            log("Exception at BookController: " + e.toString());
+        } finally {
+            request.getRequestDispatcher(SUCCESS).forward(request, response);
         }
     }
 

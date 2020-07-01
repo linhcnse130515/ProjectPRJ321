@@ -32,7 +32,7 @@ public class DBUtils implements Serializable{
         Connection conn=null;
         try {
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        String url = "jdbc:sqlserver://localhost:1433;databaseName=ProjectPRJ321";
+        String url = "jdbc:sqlserver://localhost:1433;databaseName=ProjectWeb";
         conn = DriverManager.getConnection(url,"sa","123");
        
         } catch (Exception e) {

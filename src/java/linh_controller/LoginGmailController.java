@@ -13,6 +13,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import linh_dao.UserDAO;
 import linh_dto.AccountGmail;
 import linh_dto.GooglePojo;
@@ -24,12 +25,12 @@ import linh_utils.GoogleUtils;
  */
 @WebServlet(name = "LoginGmailController", urlPatterns = {"/LoginGmailController"})
 public class LoginGmailController extends HttpServlet {
-    
+
     private static final long serialVersionUID = 1L;
     private static final String SUCCESS = "index.jsp";
     private static final String ERROR = "login.jsp";
     private static final String REGIS = "regisname.jsp";
-    
+
     public LoginGmailController() {
         super();
     }
@@ -54,12 +55,21 @@ public class LoginGmailController extends HttpServlet {
                 GooglePojo googlePojo = GoogleUtils.getUserInfo(accessToken);
                 UserDAO dao = new UserDAO();
                 AccountGmail acc = dao.checkMail(googlePojo);
-                if(acc == null){
+                if (acc == null) {
                     url = REGIS;
                     request.setAttribute("codeMail", googlePojo.getId());
                     request.setAttribute("gmail", googlePojo.getEmail());
-                }else{
+                } else {
                     url = SUCCESS;
+                    HttpSession session = request.getSession();
+                    session.setAttribute("USER", acc);
+                    String role;
+                    if (acc.getRole().trim().equals("Admin")) {
+                        role = "Admin";
+                    } else {
+                        role = "User";
+                    }
+                    session.setAttribute("ROLE", role);
                 }
             }
         } catch (Exception e) {

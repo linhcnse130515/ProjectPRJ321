@@ -35,7 +35,7 @@ public class UserDAO implements Serializable{
                 stm.setString(2, password);
                 rs = stm.executeQuery();
                 if (rs.next()) {
-                    result = new UserDTO(rs.getString("roleName").trim(), rs.getString("fullName").trim());
+                    result = new UserDTO(userID, password, rs.getString("roleName").trim(), rs.getString("fullName").trim());
                 }
             }
         } catch (Exception e) {
@@ -62,7 +62,7 @@ public class UserDAO implements Serializable{
         try {
             conn = DBUtils.getConnection();
             if (conn != null) {
-                String sql = "SELECT fullName, roleName FROM tblUserMail U,tblRole R WHERE U.roleID = R.roleID AND code = ? AND status = 'True'";
+                String sql = "SELECT fullName, roleName FROM tblUsers U,tblRole R WHERE U.roleID = R.roleID AND userID = ? AND status = 'True'";
                 stm = conn.prepareStatement(sql);
                 stm.setString(1, GP.getId());
                 rs = stm.executeQuery();
@@ -90,10 +90,10 @@ public class UserDAO implements Serializable{
         Connection conn = null;
         PreparedStatement stm = null;
         try {
-            String sql = "Insert into tblUserMail(code, gmail, fullName, status, roleID) values(?,?,?,'True',?)";
+            String sql = "Insert into tblUsers(userID, gmail, fullName, status, roleID) values(?,?,?,'True',?)";
             conn = DBUtils.getConnection();
             stm = conn.prepareStatement(sql);
-            stm.setString(1, AG.getCode());
+            stm.setString(1, AG.getUserID());
             stm.setString(2, AG.getGmail());
             stm.setString(3, AG.getFullName());
             stm.setString(4, "002");
@@ -106,5 +106,31 @@ public class UserDAO implements Serializable{
                 conn.close();
             }
         }
+    }
+    
+    public boolean insert(UserDTO dto) throws Exception {
+        Connection conn = null;
+        PreparedStatement stm = null;
+        boolean check = false;
+        try {
+            String sql = "Insert into tblUsers(userID, password, fullName, roleID, status) values(?,?,?,?,'True')";
+            conn = DBUtils.getConnection();
+            stm = conn.prepareStatement(sql);
+            stm.setString(1, dto.getUserID());
+            stm.setString(2, dto.getPassword());
+            stm.setString(3, dto.getFullName());      
+            stm.setString(4, "002");
+            check = stm.executeUpdate() > 0;
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            if (stm != null) {
+                stm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return check;
     }
 }
